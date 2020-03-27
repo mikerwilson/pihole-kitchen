@@ -1,0 +1,40 @@
+---
+driver:
+    name: vagrant
+#     # customize:
+#     #   audio: coreaudio
+#     #   audiocontroller: hda
+#     #   memory: 768
+#     #   cpus: 1
+#     #   cpuexecutioncap: 25
+    synced_folders:
+      - ["data/%{instance_name}", "/opt/xfer", "create: true"]
+
+provisioner:
+  name: ansible_playbook
+  roles_path: roles
+  hosts: all
+  playbook: site.yml
+  require_ansible_repo: true
+  ansible_verbose: true
+  require_chef_omnibus: false
+  ansible_verbosity: 2
+
+platforms:
+# Matches Raspbian from 2019-07-10 and 2019-06-20 - Linux Kernel 4.19
+- name: ubuntu-19.04
+  driver_plugin: vagrant
+  driver_config:
+    box: generic/ubuntu1904
+
+suites:
+- name: pihole
+  provisioner:
+    hosts: pihole
+    extra_vars:
+      url: http://localhost:8080
+  driver_config:
+    network:
+      - ["forwarded_port", {guest: 80, host: 8080, auto_correct: true}]
+      - ["private_network", {ip: "172.16.192.10"}]
+

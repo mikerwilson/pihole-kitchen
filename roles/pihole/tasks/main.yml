@@ -1,0 +1,40 @@
+---
+
+# Update debian cache
+- name: update apt-cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400
+
+- name: install packages
+  package:
+    name:
+      - mlocate
+      - htop
+    state: latest
+
+# Create opt and src directories
+- name: create opt/src directory
+  file:
+    path: /opt/src
+    state: directory
+    recurse: yes
+
+- name: Clone pihole repo
+  git:
+    repo: 'https://github.com/pi-hole/pi-hole.git'
+    dest: /opt/Pi-hole
+    depth: 1
+
+# Place /etc/pihole/setupVars.conf
+
+
+- name: Run pihole installer
+  shell:
+    cmd: ./basic-install.sh
+    chdir: /opt/Pi-hole/automated install
+  become: true
+
+# git clone --depth 1 https://github.com/pi-hole/pi-hole.git Pi-hole
+# cd "Pi-hole/automated install/"
+# sudo bash basic-install.sh
